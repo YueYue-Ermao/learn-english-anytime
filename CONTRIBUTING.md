@@ -1,6 +1,6 @@
 # 参与贡献
 
-感谢你改进 Context English Assistant。提交代码前，请先创建 issue 描述问题或功能目标，避免重复实现。
+感谢你改进 Learn English Anytime（随时学英语）。提交代码前，请先创建 issue 描述问题或功能目标，避免重复实现。
 
 ## 本地开发
 

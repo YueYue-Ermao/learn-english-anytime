@@ -1,12 +1,18 @@
-# Context English Assistant
+# Learn English Anytime
 
-macOS / Apple Silicon 应用。v0.6.0 增加可直接打开的本地学习中心，整合单词本、多个好句收藏夹和语法问答，同时保留菜单栏后台划词能力。
+> 中文名：随时学英语
+
+为希望持续学习英语的职场人和学生打造。当你使用电脑时遇到不懂的英文单词或句子，无需复制内容或跳转到其他网页，选中文字即可查看翻译并收听发音；当你知道中文意思、却不确定怎样用自然地道的英语表达时，也可以立即获得结合场景的英文建议。让英语学习自然地发生在工作和学习过程中。
+
+Built for professionals and students who want to keep improving their English while they work and study. Select any unfamiliar English word or sentence to see its meaning and hear its pronunciation—without copying it or leaving the page or app you are using. When you know what you want to say in Chinese but need a natural English expression, get immediate, context-aware suggestions in the same place.
+
+这是一款 macOS / Apple Silicon 应用。v0.6.0 提供可直接打开的本地学习中心，整合单词本、多个好句收藏夹和语法问答，同时保留菜单栏后台划词能力。
 
 > 当前为公开测试版：支持 macOS 14+ 和 Apple Silicon（M1/M2/M3/M4）。安装包使用临时签名，尚未完成 Apple Developer ID 公证。
 
 ## 快速开始
 
-如果只想使用应用，请打开 [Releases](https://github.com/YueYue-Ermao/context-english-assistant/releases/latest)，下载最新的 `Context-English-Assistant-*-arm64.zip`。解压后将应用放入“应用程序”，右键选择“打开”，再按引导开启辅助功能权限。
+如果只想使用应用，请打开 [Releases](https://github.com/YueYue-Ermao/learn-english-anytime/releases/latest)，下载最新的 `Context-English-Assistant-*-arm64.zip`。解压后将应用放入“应用程序”，右键选择“打开”，再按引导开启辅助功能权限。
 
 - [完整使用说明](docs/USAGE.md)
 - [技术架构](docs/TECHNICAL_ARCHITECTURE.md)

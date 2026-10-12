@@ -4,7 +4,7 @@
 
 ## 本地处理
 
-以下功能不向 Context English Assistant 的项目服务发送内容：
+以下功能不向 Learn English Anytime 项目服务发送内容：
 
 - 离线英汉/汉英查词；
 - 单词本和好句收藏夹；
