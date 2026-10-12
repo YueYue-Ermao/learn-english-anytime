@@ -67,7 +67,7 @@ Safari / Chrome / Office / Electron / 其他应用
 | 场景化地道表达 | 用户配置的 AI 服务 | 是，主动触发 |
 | 开放式语法解释 | 用户配置的 AI 服务 | 是，主动触发 |
 
-`LookupRoutingPolicy` 根据语言、长度、是否为句子和本地命中状态选择入口。模型能力在 UI 中以独立按钮呈现，避免基础查询意外产生费用。
+`LookupRoutingPolicy` 根据语言、长度、是否为句子和本地命中状态选择入口。`AutomaticTranslationPolicy` 会在设备端翻译可用时，自动处理最多 280 个字符、且词典没有结果的短语或短句；单个未知词和长段落仍保持手动。模型能力在 UI 中以独立按钮呈现，避免基础查询意外产生费用。
 
 ## 5. 所在句与上下文
 
@@ -164,3 +164,4 @@ python3 services/contextual-translation/server.py --self-test
 - Apple Translation 需要 macOS 15+；macOS 14 仍可使用词典和可选 AI 服务。
 - 多显示器上下排列的坐标转换仍需要更多真机验证。
 - 当前 Release 为临时签名的公开测试包，正式分发应使用 Apple Developer ID 签名和公证。
+- iOS 不能像 macOS 一样在后台读取任意应用选区；移动端差异与共享边界见 [跨平台路线图](CROSS_PLATFORM_ROADMAP.md)。
