@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Swift package
+        run: swift build
+      - name: Run Swift tests
+        run: swift test
+      - name: Run service self-test
+        run: python3 services/contextual-translation/server.py --self-test

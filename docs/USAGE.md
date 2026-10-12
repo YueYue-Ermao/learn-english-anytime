@@ -1,0 +1,84 @@
+# 使用说明
+
+## 安装
+
+1. 在 GitHub Releases 下载最新的 `Context-English-Assistant-*-arm64.zip`。
+2. 解压后，将 `Context English Assistant.app` 拖入“应用程序”。
+3. 首次启动若被 macOS 拦截，请在 Finder 中右键应用并选择“打开”。当前公开测试包使用临时签名，尚未完成 Apple Developer ID 公证。
+4. 在应用的“划词与权限”页面点击“打开辅助功能设置”。
+5. 前往 `系统设置 → 隐私与安全性 → 辅助功能`，开启当前应用。
+6. 回到应用点击“重新检测权限”；状态变绿后可用“显示测试浮窗”验证。
+
+仅支持 Apple Silicon（M1/M2/M3/M4 等）和 macOS 14 或更高版本。
+
+## 划词查询
+
+在 Safari、Chrome、Microsoft Office、Codex 或其他可访问性兼容的应用中拖动选中英文或中文，松开鼠标约 0.3 秒：
+
+- 默认显示轻量 `A` 按钮，点击后展开结果。
+- 打开“选中即展示”后，选中内容会直接显示完整浮窗。
+- 开始新的鼠标、滚轮、右键或键盘操作会取消尚未出现的提示，减少对复制等操作的打扰。
+- 菜单栏支持暂停 1、2 或 4 小时；暂停后菜单会显示恢复入口。
+
+如果 Safari 正常而 Chrome 或 Electron 应用无反应，请完全退出目标应用后重新打开，并确认 Context English Assistant 的辅助功能权限仍为绿色。
+
+## 查词与翻译路由
+
+- 英文单词和词组：优先使用离线 ECDICT。
+- 常见中文词语：优先使用离线汉英反向索引。
+- 中英文句子：macOS 15 及以上可使用 Apple 本机翻译；首次使用可能需要联网下载语言包。
+- 地道表达、场景改写和语法解释：只有用户主动点击相应按钮后，才请求配置的 AI 服务。
+
+划词时若能取得所在句，应用会把词义与句子语境一同展示；目标应用没有暴露上下文时，会明确降级为仅处理选中文字。
+
+## 收藏与学习中心
+
+启动应用会打开“英语学习中心”：
+
+- “我的单词本”用于搜索、朗读、复制和取消收藏单词或词组。
+- “好句收藏夹”支持新建多个主题、手动添加句子、移动收藏、朗读和复制。
+- “语法问答”可输入句子、具体问题和可选场景，得到结构化解释。
+
+收藏数据只保存在本机：
+
+```text
+~/Library/Application Support/Context English Assistant/user.sqlite3
+```
+
+更新应用不会删除该文件。卸载前如需保留数据，请先备份它。
+
+## 可选 AI 服务
+
+不配置 AI 服务仍可使用离线查词、收藏、学习中心和支持系统版本上的 Apple 本机翻译。
+
+本机模拟联调：
+
+```bash
+CONTEXT_TRANSLATION_MOCK=1 python3 services/contextual-translation/server.py
+```
+
+然后在应用中打开“AI 服务设置”，点击“使用本机开发服务”并保存。模拟结果仅用于验证流程。
+
+真实模型模式：
+
+```bash
+OPENAI_API_KEY="your-server-side-key" \
+OPENAI_MODEL="gpt-6-astra" \
+python3 services/contextual-translation/server.py
+```
+
+不要把 API Key 填进桌面客户端或提交到 GitHub。公开部署必须增加 HTTPS、用户鉴权、速率限制、成本上限和脱敏监控。
+
+## 常见问题
+
+### 已开启辅助功能，应用仍未识别
+
+从系统设置中移除旧条目，只保留 `/Applications/Context English Assistant.app`；不要在授权后移动或重命名应用。然后完全退出并重新启动应用与目标程序。
+
+### 单词显示“未收录”
+
+GitHub 源码仓库因文件大小限制不包含完整数据库；GitHub Release 的安装包已经内置。自己从源码构建时，请按 [离线词典说明](DICTIONARY.md) 生成数据库。
+
+### AI 功能报连接失败
+
+确认 Python 服务仍在运行，并访问 `http://127.0.0.1:8765/healthz` 检查状态。终端关闭后，本机服务也会停止。

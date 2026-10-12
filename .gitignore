@@ -1,0 +1,11 @@
+.build/
+.swiftpm/
+.DS_Store
+*.xcuserstate
+DerivedData/
+dist/
+Resources/App/ecdict.sqlite3
+*.sqlite3-wal
+*.sqlite3-shm
+.env
+.env.*

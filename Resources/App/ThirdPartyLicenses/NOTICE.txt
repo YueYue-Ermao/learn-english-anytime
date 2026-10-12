@@ -1,0 +1,10 @@
+ECDICT offline dictionary data
+
+Source: https://github.com/skywind3000/ECDICT
+Data file: ecdict.csv
+Retrieved: 2026-09-24
+SHA-256: 1a6947e04785db63613a92e14903cdae7954f7e84860b10e68e5c7cbb3f9c3cf
+Repository license: MIT (see ECDICT-LICENSE.txt)
+
+The separately distributed lemma.en.txt file is not included in this app.
+Inflection mappings are derived only from the exchange field in ecdict.csv.
