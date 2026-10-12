@@ -18,7 +18,7 @@ final class SetupWindowController: NSWindowController, NSWindowDelegate {
             backing: .buffered,
             defer: false
         )
-        window.title = "Context English Assistant"
+        window.title = "Learn English Anytime"
         window.isReleasedWhenClosed = false
         window.center()
 
@@ -99,16 +99,19 @@ final class SetupWindowController: NSWindowController, NSWindowDelegate {
         copyWarning.font = .systemFont(ofSize: 12, weight: .medium)
         copyWarning.textColor = .systemOrange
 
-        let permissionButton = ActionButton(title: "打开辅助功能设置…") { [weak self] in
+        let permissionButton = ActionButton(
+            title: "打开辅助功能设置",
+            symbolName: "lock.open.fill",
+            style: .primary
+        ) { [weak self] in
             self?.onRequestPermission?()
         }
-        permissionButton.bezelStyle = .rounded
 
-        let refreshButton = ActionButton(title: "重新检测权限") { [weak self] in
+        let refreshButton = ActionButton(title: "重新检测权限", symbolName: "arrow.clockwise") { [weak self] in
             self?.onRefresh?()
         }
 
-        let demoButton = ActionButton(title: "显示测试浮窗") { [weak self] in
+        let demoButton = ActionButton(title: "显示测试浮窗", symbolName: "rectangle.and.text.magnifyingglass") { [weak self] in
             self?.onShowDemo?()
         }
 

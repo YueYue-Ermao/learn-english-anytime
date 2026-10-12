@@ -28,16 +28,20 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
         self.favorites = favorites
 
         weak var weakController: ExpressionWindowController?
-        generateButton = ActionButton(title: "生成地道表达") {
+        generateButton = ActionButton(
+            title: "生成地道表达",
+            symbolName: "sparkles",
+            style: .primary
+        ) {
             weakController?.generate()
         }
-        speakButton = ActionButton(title: "▶ 朗读首选") {
+        speakButton = ActionButton(title: "朗读首选", symbolName: "speaker.wave.2") {
             weakController?.speakPrimary()
         }
-        copyButton = ActionButton(title: "复制首选") {
+        copyButton = ActionButton(title: "复制首选", symbolName: "doc.on.doc") {
             weakController?.copyPrimary()
         }
-        favoriteButton = ActionButton(title: "☆ 收藏首选") {
+        favoriteButton = ActionButton(title: "收藏首选", symbolName: "star") {
             weakController?.toggleFavorite()
         }
 
@@ -85,6 +89,12 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
 
     private func configureContent() {
         guard let contentView = window?.contentView else { return }
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = AppVisualTheme.surface.cgColor
+
+        let eyebrow = NSTextField(labelWithString: "CONTEXT-AWARE ENGLISH")
+        eyebrow.font = .systemFont(ofSize: 10.5, weight: .bold)
+        eyebrow.textColor = AppVisualTheme.accent
 
         let title = NSTextField(labelWithString: "把你真正想表达的意思说清楚")
         title.font = .systemFont(ofSize: 22, weight: .bold)
@@ -136,6 +146,7 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
         actionRow.alignment = .centerY
 
         let root = NSStackView(views: [
+            eyebrow,
             title,
             intro,
             inputLabel,
@@ -180,13 +191,13 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
         textView.font = .systemFont(ofSize: 14)
         textView.textContainerInset = NSSize(width: 8, height: 8)
         textView.drawsBackground = true
-        textView.backgroundColor = .textBackgroundColor
+        textView.backgroundColor = AppVisualTheme.raisedSurface
         textView.setAccessibilityPlaceholderValue(placeholder)
 
         let scroll = NSScrollView()
         scroll.documentView = textView
         scroll.hasVerticalScroller = true
-        scroll.borderType = .bezelBorder
+        scroll.borderType = .lineBorder
         return scroll
     }
 
@@ -270,7 +281,9 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
             minimalContextText: sourceInput
         )
         currentFavoriteDraft = favoriteDraft
-        favoriteButton.title = favorites.contains(favoriteDraft) ? "★ 已收藏" : "☆ 收藏首选"
+        let isFavorite = favorites.contains(favoriteDraft)
+        favoriteButton.title = isFavorite ? "已收藏" : "收藏首选"
+        favoriteButton.image = AppVisualTheme.symbol(isFavorite ? "star.fill" : "star")
         statusLabel.textColor = .systemGreen
         statusLabel.stringValue = "生成完成。结果可选择、复制、朗读或收藏。"
         updateActionButtons()
@@ -301,7 +314,8 @@ final class ExpressionWindowController: NSWindowController, NSWindowDelegate {
         guard let draft = currentFavoriteDraft else { return }
         do {
             let isFavorite = try favorites.toggle(draft)
-            favoriteButton.title = isFavorite ? "★ 已收藏" : "☆ 收藏首选"
+            favoriteButton.title = isFavorite ? "已收藏" : "收藏首选"
+            favoriteButton.image = AppVisualTheme.symbol(isFavorite ? "star.fill" : "star")
             statusLabel.textColor = .systemGreen
             statusLabel.stringValue = isFavorite ? "已收藏首选表达。" : "已取消收藏。"
         } catch {
