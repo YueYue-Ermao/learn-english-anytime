@@ -46,6 +46,9 @@ protocol LocalTranslationProviding: AnyObject {
 @MainActor
 final class AppleLocalTranslationService: LocalTranslationProviding {
     private let bridge = AppleTranslationBridge()
+    private var cache: [String: LocalTranslationResult] = [:]
+    private var cacheOrder: [String] = []
+    private let cacheLimit = 200
 
     lazy var hostView: NSView = {
         let view = NSHostingView(rootView: AppleTranslationHostView(bridge: bridge))
@@ -62,6 +65,10 @@ final class AppleLocalTranslationService: LocalTranslationProviding {
             $0.text.trimmingCharacters(in: .whitespacesAndNewlines)
                 != draft.selectedText.trimmingCharacters(in: .whitespacesAndNewlines)
         } ?? false
+        let cacheKey = [languages.source, languages.target, sourceText].joined(separator: "\u{1F}")
+        if let cached = cache[cacheKey] {
+            return cached
+        }
         let request = AppleTranslationRequest(
             id: UUID(),
             sourceText: sourceText,
@@ -70,12 +77,24 @@ final class AppleLocalTranslationService: LocalTranslationProviding {
             usedSentenceContext: usedSentenceContext
         )
 
-        return try await withTaskCancellationHandler {
+        let result = try await withTaskCancellationHandler {
             try await bridge.submit(request)
         } onCancel: {
             Task { @MainActor [weak bridge] in
                 bridge?.cancel(requestID: request.id)
             }
+        }
+        store(result, forKey: cacheKey)
+        return result
+    }
+
+    private func store(_ result: LocalTranslationResult, forKey key: String) {
+        cache[key] = result
+        cacheOrder.removeAll { $0 == key }
+        cacheOrder.append(key)
+        if cacheOrder.count > cacheLimit {
+            let evicted = cacheOrder.removeFirst()
+            cache.removeValue(forKey: evicted)
         }
     }
 
@@ -136,6 +155,9 @@ private final class AppleTranslationBridge: ObservableObject {
         pendingRequest = nil
         if error is CancellationError {
             continuation?.resume(throwing: CancellationError())
+        } else if error.localizedDescription.localizedCaseInsensitiveContains("not installed")
+                    || error.localizedDescription.contains("未安装") {
+            continuation?.resume(throwing: LocalTranslationError.languagePackNotInstalled)
         } else if TranslationError.unsupportedLanguagePairing ~= error
                     || TranslationError.unsupportedSourceLanguage ~= error
                     || TranslationError.unsupportedTargetLanguage ~= error {
