@@ -1,0 +1,60 @@
+name: Bug 报告
+description: 报告安装、权限、划词、翻译、收藏或其他功能问题
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请不要提交 API Key、公司机密、个人文档或包含敏感信息的截图。
+  - type: input
+    id: version
+    attributes:
+      label: 应用版本
+      description: 可在发布说明或应用信息中查看，例如 0.6.0（build 10）。
+      placeholder: 0.6.0（build 10）
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS 与芯片
+      placeholder: macOS 15.6 / Apple M4
+    validations:
+      required: true
+  - type: input
+    id: target_app
+    attributes:
+      label: 出现问题的应用
+      description: 如果是划词问题，请填写 Safari、Chrome、Word、Codex 等目标应用及版本。
+      placeholder: Chrome 版本号 / Microsoft Word 版本号
+  - type: textarea
+    id: problem
+    attributes:
+      label: 问题描述
+      description: 实际发生了什么？你原本期望发生什么？
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开……
+        2. 选中……
+        3. 点击……
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: 诊断信息
+      description: 可填写权限窗口显示的状态、错误文字或已脱敏截图。
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: 隐私确认
+      options:
+        - label: 我已确认反馈中不包含 API Key、账号凭据或其他敏感信息。
+          required: true

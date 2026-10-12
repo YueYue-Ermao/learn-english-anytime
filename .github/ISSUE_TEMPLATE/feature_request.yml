@@ -1,0 +1,37 @@
+name: 功能建议
+description: 描述一个真实学习或工作场景，以及希望应用如何帮助你
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 使用场景
+      description: 你当时在做什么？在哪个应用中？为什么现有操作不方便？
+      placeholder: 我在准备产品经理英文面试时……
+    validations:
+      required: true
+  - type: textarea
+    id: current_workaround
+    attributes:
+      label: 目前的解决方式
+      description: 你现在如何完成这件事？
+  - type: textarea
+    id: desired_outcome
+    attributes:
+      label: 希望达到的结果
+      description: 请描述理想体验，不必先设计具体按钮。
+    validations:
+      required: true
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: 使用频率
+      options:
+        - 每天多次
+        - 每周多次
+        - 偶尔使用
+        - 仅特定任务使用
+    validations:
+      required: true

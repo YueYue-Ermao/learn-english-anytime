@@ -2,6 +2,23 @@
 
 > 中文名：随时学英语
 
+<p align="center">
+  <img src="assets/social-preview.png" alt="Learn English Anytime：选中英文即可查看翻译和发音，也可获得自然的英文表达建议" width="100%">
+</p>
+
+<p align="center">
+  <strong>不离开当前页面，随时查词、听发音、学会地道表达。</strong><br>
+  Translate, pronounce, and express naturally—without leaving what you’re doing.
+</p>
+
+<p align="center">
+  <a href="https://github.com/YueYue-Ermao/learn-english-anytime/releases/latest"><strong>⬇️ 下载最新版</strong></a>
+  ·
+  <a href="docs/USAGE.md">使用说明</a>
+  ·
+  <a href="https://github.com/YueYue-Ermao/learn-english-anytime/issues/new/choose">反馈问题</a>
+</p>
+
 为希望持续学习英语的职场人和学生打造。当你使用电脑时遇到不懂的英文单词或句子，无需复制内容或跳转到其他网页，选中文字即可查看翻译并收听发音；当你知道中文意思、却不确定怎样用自然地道的英语表达时，也可以立即获得结合场景的英文建议。让英语学习自然地发生在工作和学习过程中。
 
 Built for professionals and students who want to keep improving their English while they work and study. Select any unfamiliar English word or sentence to see its meaning and hear its pronunciation—without copying it or leaving the page or app you are using. When you know what you want to say in Chinese but need a natural English expression, get immediate, context-aware suggestions in the same place.
@@ -9,6 +26,14 @@ Built for professionals and students who want to keep improving their English wh
 这是一款 macOS / Apple Silicon 应用。v0.6.0 提供可直接打开的本地学习中心，整合单词本、多个好句收藏夹和语法问答，同时保留菜单栏后台划词能力。
 
 > 当前为公开测试版：支持 macOS 14+ 和 Apple Silicon（M1/M2/M3/M4）。安装包使用临时签名，尚未完成 Apple Developer ID 公证。
+
+## 三个核心体验
+
+| 随时理解 | 自然表达 | 持续积累 |
+|---|---|---|
+| 在网页、Office 和常见应用中选中英文，直接查看释义与发音 | 输入中文意思和使用场景，获得更符合真实语境的英文表达 | 把单词、词组和好句收藏到本地学习中心，随时搜索和复习 |
+
+基础查词、收藏和支持系统版本上的 Apple 本机翻译无需项目 AI 服务。地道化表达和语法问答是用户主动触发的可选能力。
 
 ## 快速开始
 
@@ -18,6 +43,7 @@ Built for professionals and students who want to keep improving their English wh
 - [技术架构](docs/TECHNICAL_ARCHITECTURE.md)
 - [离线词典构建](docs/DICTIONARY.md)
 - [隐私说明](docs/PRIVACY.md)
+- [正式签名与公证准备](docs/DISTRIBUTION.md)
 - [v0.6.0 发布说明](docs/releases/v0.6.0.md)
 
 从源码构建时请注意：完整离线词典约 108 MiB，超过 GitHub 单文件限制，因此不提交到源码仓库；Release 安装包已经内置，开发者也可以按照词典文档重建。
