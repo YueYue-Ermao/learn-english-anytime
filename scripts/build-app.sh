@@ -17,7 +17,7 @@ swift build --disable-sandbox -c release --product ContextEnglishAssistant
 BIN_DIR="$(swift build --disable-sandbox -c release --show-bin-path)"
 APP_DIR="$PROJECT_DIR/dist/Context English Assistant.app"
 CONTENTS_DIR="$APP_DIR/Contents"
-ZIP_PATH="$PROJECT_DIR/dist/Context-English-Assistant-v0.6.0-arm64.zip"
+ZIP_PATH="$PROJECT_DIR/dist/Context-English-Assistant-v0.7.0-arm64.zip"
 
 rm -rf "$APP_DIR"
 rm -f "$ZIP_PATH"

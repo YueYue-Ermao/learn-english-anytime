@@ -18,7 +18,11 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
     private let repository: FavoritesRepository
     private let grammarService: GrammarQuestionProviding
     private let sectionControl = NSSegmentedControl(labels: ["我的单词本", "好句收藏夹", "语法问答"], trackingMode: .selectOne, target: nil, action: nil)
-    private let contentContainer = NSView()
+    private let contentContainer = RoundedSurfaceView(
+        fillColor: AppVisualTheme.surface,
+        strokeColor: AppVisualTheme.border,
+        radius: 16
+    )
     private var sectionViews: [LearningCenterSection: NSView] = [:]
     private var currentSection = LearningCenterSection.words
 
@@ -56,7 +60,7 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
             backing: .buffered,
             defer: false
         )
-        window.title = "Context English Assistant · 学习中心"
+        window.title = "Learn English Anytime · 学习中心"
         window.minSize = NSSize(width: 820, height: 580)
         window.isReleasedWhenClosed = false
         window.center()
@@ -148,28 +152,38 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
 
     private func configureContent() {
         guard let contentView = window?.contentView else { return }
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = AppVisualTheme.surface.cgColor
+
+        let eyebrow = NSTextField(labelWithString: "LEARN ENGLISH ANYTIME")
+        eyebrow.font = .systemFont(ofSize: 10.5, weight: .bold)
+        eyebrow.textColor = AppVisualTheme.accent
 
         let title = NSTextField(labelWithString: "你的英语学习中心")
-        title.font = .systemFont(ofSize: 25, weight: .bold)
+        title.font = .systemFont(ofSize: 26, weight: .bold)
         let subtitle = NSTextField(wrappingLabelWithString:
             "全局划词继续在后台工作；在这里整理单词、按主题收藏好句，并针对具体英文句子提问语法。"
         )
         subtitle.textColor = .secondaryLabelColor
 
-        let expressionButton = ActionButton(title: "这样表达…") { [weak self] in
+        let expressionButton = ActionButton(
+            title: "这样表达",
+            symbolName: "sparkles",
+            style: .primary
+        ) { [weak self] in
             self?.onOpenExpressionComposer?()
         }
-        let setupButton = ActionButton(title: "划词与权限…") { [weak self] in
+        let setupButton = ActionButton(title: "划词与权限", symbolName: "cursorarrow.motionlines") { [weak self] in
             self?.onOpenSetup?()
         }
-        let settingsButton = ActionButton(title: "AI 服务设置…") { [weak self] in
+        let settingsButton = ActionButton(title: "AI 设置", symbolName: "gearshape") { [weak self] in
             self?.onOpenServiceSettings?()
         }
         let topActions = NSStackView(views: [expressionButton, setupButton, settingsButton])
         topActions.orientation = .horizontal
         topActions.spacing = 8
 
-        let titleColumn = NSStackView(views: [title, subtitle])
+        let titleColumn = NSStackView(views: [eyebrow, title, subtitle])
         titleColumn.orientation = .vertical
         titleColumn.alignment = .leading
         titleColumn.spacing = 4
@@ -178,28 +192,42 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         header.alignment = .centerY
         header.spacing = 16
 
+        let headerCard = RoundedSurfaceView(
+            fillColor: AppVisualTheme.raisedSurface,
+            strokeColor: AppVisualTheme.border,
+            radius: 16
+        )
+        headerCard.addSubview(header)
+        header.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            header.leadingAnchor.constraint(equalTo: headerCard.leadingAnchor, constant: 18),
+            header.trailingAnchor.constraint(equalTo: headerCard.trailingAnchor, constant: -18),
+            header.topAnchor.constraint(equalTo: headerCard.topAnchor, constant: 16),
+            header.bottomAnchor.constraint(equalTo: headerCard.bottomAnchor, constant: -16)
+        ])
+
         sectionControl.selectedSegment = 0
-        sectionControl.segmentStyle = .automatic
+        sectionControl.segmentStyle = .rounded
         sectionControl.target = self
         sectionControl.action = #selector(sectionChanged)
 
         contentContainer.translatesAutoresizingMaskIntoConstraints = false
-        let root = NSStackView(views: [header, sectionControl, separator(), contentContainer])
+        let root = NSStackView(views: [headerCard, sectionControl, contentContainer])
         root.orientation = .vertical
         root.alignment = .leading
-        root.spacing = 14
+        root.spacing = 12
         root.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(root)
 
         NSLayoutConstraint.activate([
-            root.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            root.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
-            root.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            root.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20),
-            header.widthAnchor.constraint(equalTo: root.widthAnchor),
+            root.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            root.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            root.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 18),
+            root.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -18),
+            headerCard.widthAnchor.constraint(equalTo: root.widthAnchor),
             titleColumn.widthAnchor.constraint(greaterThanOrEqualToConstant: 430),
             topActions.trailingAnchor.constraint(equalTo: header.trailingAnchor),
-            sectionControl.widthAnchor.constraint(equalToConstant: 430),
+            sectionControl.widthAnchor.constraint(equalToConstant: 470),
             contentContainer.widthAnchor.constraint(equalTo: root.widthAnchor),
             contentContainer.heightAnchor.constraint(greaterThanOrEqualToConstant: 430)
         ])
@@ -211,10 +239,10 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
             view.translatesAutoresizingMaskIntoConstraints = false
             contentContainer.addSubview(view)
             NSLayoutConstraint.activate([
-                view.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor),
-                view.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor),
-                view.topAnchor.constraint(equalTo: contentContainer.topAnchor),
-                view.bottomAnchor.constraint(equalTo: contentContainer.bottomAnchor)
+                view.leadingAnchor.constraint(equalTo: contentContainer.leadingAnchor, constant: 16),
+                view.trailingAnchor.constraint(equalTo: contentContainer.trailingAnchor, constant: -16),
+                view.topAnchor.constraint(equalTo: contentContainer.topAnchor, constant: 16),
+                view.bottomAnchor.constraint(equalTo: contentContainer.bottomAnchor, constant: -16)
             ])
         }
     }
@@ -233,9 +261,9 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         addColumn(to: wordTable, identifier: "word_date", title: "收藏时间", width: 105)
         configureTable(wordTable)
 
-        let speak = ActionButton(title: "▶ 朗读") { [weak self] in self?.speakSelectedWord() }
-        let copy = ActionButton(title: "复制") { [weak self] in self?.copySelectedWord() }
-        let remove = ActionButton(title: "取消收藏") { [weak self] in self?.removeSelectedWord() }
+        let speak = ActionButton(title: "朗读", symbolName: "speaker.wave.2") { [weak self] in self?.speakSelectedWord() }
+        let copy = ActionButton(title: "复制", symbolName: "doc.on.doc") { [weak self] in self?.copySelectedWord() }
+        let remove = ActionButton(title: "取消收藏", symbolName: "trash", style: .danger) { [weak self] in self?.removeSelectedWord() }
         let actions = NSStackView(views: [speak, copy, remove])
         actions.orientation = .horizontal
         actions.spacing = 8
@@ -273,8 +301,8 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         collectionTable.rowHeight = 36
         let collectionScroll = tableScrollView(collectionTable)
 
-        let addCollection = ActionButton(title: "+ 新建") { [weak self] in self?.createCollection() }
-        let deleteCollection = ActionButton(title: "删除") { [weak self] in self?.deleteSelectedCollection() }
+        let addCollection = ActionButton(title: "新建", symbolName: "plus", style: .primary) { [weak self] in self?.createCollection() }
+        let deleteCollection = ActionButton(title: "删除", symbolName: "trash", style: .danger) { [weak self] in self?.deleteSelectedCollection() }
         let collectionActions = NSStackView(views: [addCollection, deleteCollection])
         collectionActions.orientation = .horizontal
         collectionActions.spacing = 8
@@ -299,11 +327,11 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         searchHeader.alignment = .centerY
         searchHeader.spacing = 12
         let sentenceScroll = tableScrollView(sentenceTable)
-        let addSentence = ActionButton(title: "+ 添加好句") { [weak self] in self?.addSentence() }
-        let speak = ActionButton(title: "▶ 朗读") { [weak self] in self?.speakSelectedSentence() }
-        let copy = ActionButton(title: "复制") { [weak self] in self?.copySelectedSentence() }
+        let addSentence = ActionButton(title: "添加好句", symbolName: "plus", style: .primary) { [weak self] in self?.addSentence() }
+        let speak = ActionButton(title: "朗读", symbolName: "speaker.wave.2") { [weak self] in self?.speakSelectedSentence() }
+        let copy = ActionButton(title: "复制", symbolName: "doc.on.doc") { [weak self] in self?.copySelectedSentence() }
         let move = ActionButton(title: "移入收藏夹…") { [weak self] in self?.moveSelectedSentence() }
-        let remove = ActionButton(title: "取消收藏") { [weak self] in self?.removeSelectedSentence() }
+        let remove = ActionButton(title: "取消收藏", symbolName: "trash", style: .danger) { [weak self] in self?.removeSelectedSentence() }
         let sentenceActions = NSStackView(views: [addSentence, speak, copy, move, remove])
         sentenceActions.orientation = .horizontal
         sentenceActions.spacing = 8
@@ -358,11 +386,11 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
             placeholder: "回答会包含直接结论、语法结构、为什么这样用、其他可用形式和新例句。",
             editable: false
         )
-        grammarAnswerView.backgroundColor = .controlBackgroundColor
+        grammarAnswerView.backgroundColor = AppVisualTheme.raisedSurface
         grammarStatusLabel.textColor = .secondaryLabelColor
         grammarStatusLabel.stringValue = "语法问答属于可选 AI 功能，可能产生 API 费用。"
 
-        grammarAskButton = ActionButton(title: "提问") { [weak self] in self?.askGrammarQuestion() }
+        grammarAskButton = ActionButton(title: "提问", symbolName: "arrow.up.circle.fill", style: .primary) { [weak self] in self?.askGrammarQuestion() }
         grammarAskButton.keyEquivalent = "\r"
         let loadExample = ActionButton(title: "载入示例") { [weak self] in self?.loadGrammarExample() }
         grammarCopyButton = ActionButton(title: "复制回答") { [weak self] in self?.copyGrammarAnswer() }
@@ -760,8 +788,9 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         table.delegate = self
         table.dataSource = self
         table.headerView = table.headerView ?? NSTableHeaderView()
-        table.rowHeight = 31
-        table.usesAlternatingRowBackgroundColors = true
+        table.rowHeight = 34
+        table.usesAlternatingRowBackgroundColors = false
+        table.style = .inset
         table.allowsMultipleSelection = false
     }
 
@@ -778,7 +807,8 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         scroll.documentView = table
         scroll.hasVerticalScroller = true
         scroll.hasHorizontalScroller = true
-        scroll.borderType = .bezelBorder
+        scroll.borderType = .noBorder
+        scroll.drawsBackground = false
         return scroll
     }
 
@@ -830,12 +860,12 @@ final class LearningCenterWindowController: NSWindowController, NSWindowDelegate
         textView.font = .systemFont(ofSize: 14)
         textView.textContainerInset = NSSize(width: 9, height: 8)
         textView.drawsBackground = true
-        textView.backgroundColor = .textBackgroundColor
+        textView.backgroundColor = AppVisualTheme.raisedSurface
         textView.setAccessibilityPlaceholderValue(placeholder)
         let scroll = NSScrollView()
         scroll.documentView = textView
         scroll.hasVerticalScroller = true
-        scroll.borderType = .bezelBorder
+        scroll.borderType = .lineBorder
         return scroll
     }
 

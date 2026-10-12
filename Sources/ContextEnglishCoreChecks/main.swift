@@ -135,10 +135,45 @@ private func runLookupRoutingChecks() {
     )
 }
 
+private func runAutomaticTranslationChecks() {
+    let policy = AutomaticTranslationPolicy()
+    check(
+        policy.shouldTranslate(
+            text: "I will follow up tomorrow.",
+            language: .english,
+            route: .modelRecommended,
+            hasLocalEntry: false,
+            serviceAvailable: true
+        ),
+        "short sentences should automatically use available on-device translation"
+    )
+    check(
+        !policy.shouldTranslate(
+            text: "unlistedword",
+            language: .english,
+            route: .localDictionaryFirst,
+            hasLocalEntry: false,
+            serviceAvailable: true
+        ),
+        "single unknown words should remain manual"
+    )
+    check(
+        !policy.shouldTranslate(
+            text: "I will follow up tomorrow.",
+            language: .english,
+            route: .modelRecommended,
+            hasLocalEntry: false,
+            serviceAvailable: false
+        ),
+        "automatic translation should require an on-device service"
+    )
+}
+
 runPauseChecks()
 runTriggerPolicyChecks()
 runTextContextChecks()
 runLookupRoutingChecks()
+runAutomaticTranslationChecks()
 
 if failures.isEmpty {
     print("Core checks passed")

@@ -65,15 +65,23 @@ final class LookupPanelController {
     }
 
     func showHint(for snapshot: SelectionSnapshot, onActivate: @escaping () -> Void) {
-        let button = ActionButton(title: "A", bezelStyle: .circular, handler: onActivate)
-        button.font = .systemFont(ofSize: 13, weight: .semibold)
+        let button = ActionButton(
+            title: "",
+            symbolName: "character.book.closed.fill",
+            style: .primary,
+            bezelStyle: .circular,
+            handler: onActivate
+        )
         button.toolTip = "查看翻译、释义和发音"
 
         let effect = NSVisualEffectView()
         effect.material = .popover
         effect.state = .active
         effect.wantsLayer = true
-        effect.layer?.cornerRadius = 16
+        effect.layer?.cornerRadius = 20
+        effect.layer?.cornerCurve = .continuous
+        effect.layer?.borderColor = AppVisualTheme.border.cgColor
+        effect.layer?.borderWidth = 1
         effect.translatesAutoresizingMaskIntoConstraints = false
         effect.addSubview(button)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -81,37 +89,89 @@ final class LookupPanelController {
         NSLayoutConstraint.activate([
             button.centerXAnchor.constraint(equalTo: effect.centerXAnchor),
             button.centerYAnchor.constraint(equalTo: effect.centerYAnchor),
-            button.widthAnchor.constraint(equalToConstant: 28),
-            button.heightAnchor.constraint(equalToConstant: 28)
+            button.widthAnchor.constraint(equalToConstant: 34),
+            button.heightAnchor.constraint(equalToConstant: 34)
         ])
 
-        let size = NSSize(width: 36, height: 36)
+        let size = NSSize(width: 42, height: 42)
         installDisplayedContent(effect, size: size)
         positionPanel(size: size, near: snapshot.bounds)
         panel.orderFrontRegardless()
     }
 
     func showFull(_ presentation: LookupPresentation, near bounds: CGRect?) {
+        let brandLabel = makeLabel(
+            "Aa",
+            font: .systemFont(ofSize: 15, weight: .bold),
+            color: AppVisualTheme.accent
+        )
+        brandLabel.alignment = .center
+        brandLabel.isSelectable = false
+        let brand = RoundedSurfaceView(
+            fillColor: AppVisualTheme.accentSoft,
+            strokeColor: AppVisualTheme.accent.withAlphaComponent(0.20),
+            radius: 11
+        )
+        brand.addSubview(brandLabel)
+        brandLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            brand.widthAnchor.constraint(equalToConstant: 42),
+            brand.heightAnchor.constraint(equalToConstant: 42),
+            brandLabel.centerXAnchor.constraint(equalTo: brand.centerXAnchor),
+            brandLabel.centerYAnchor.constraint(equalTo: brand.centerYAnchor)
+        ])
+
         let title = makeLabel(
             presentation.title,
-            font: .systemFont(ofSize: 19, weight: .semibold),
+            font: .systemFont(ofSize: 20, weight: .bold),
             color: .labelColor
         )
         title.maximumNumberOfLines = 2
 
         let pronunciation = makeLabel(
             presentation.pronunciation ?? "",
-            font: .systemFont(ofSize: 12),
+            font: .monospacedSystemFont(ofSize: 12, weight: .regular),
             color: .secondaryLabelColor
         )
         pronunciation.isHidden = presentation.pronunciation == nil
 
+        let titleColumn = NSStackView(views: [title, pronunciation])
+        titleColumn.orientation = .vertical
+        titleColumn.alignment = .leading
+        titleColumn.spacing = 3
+
+        let close = ActionButton(
+            title: "",
+            symbolName: "xmark",
+            style: .quiet
+        ) { [weak self] in
+            self?.hide()
+        }
+        close.toolTip = "关闭"
+
+        let headerSpacer = flexibleSpacer()
+        let header = NSStackView(views: [brand, titleColumn, headerSpacer, close])
+        header.orientation = .horizontal
+        header.alignment = .centerY
+        header.spacing = 10
+
         let meaning = makeLabel(
             presentation.meaning,
-            font: .systemFont(ofSize: 14),
+            font: .systemFont(ofSize: 14.5, weight: .regular),
             color: .labelColor
         )
         meaning.maximumNumberOfLines = 10
+        meaning.lineBreakMode = .byWordWrapping
+
+        let meaningCard = RoundedSurfaceView()
+        meaningCard.addSubview(meaning)
+        meaning.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            meaning.leadingAnchor.constraint(equalTo: meaningCard.leadingAnchor, constant: 13),
+            meaning.trailingAnchor.constraint(equalTo: meaningCard.trailingAnchor, constant: -13),
+            meaning.topAnchor.constraint(equalTo: meaningCard.topAnchor, constant: 11),
+            meaning.bottomAnchor.constraint(equalTo: meaningCard.bottomAnchor, constant: -11)
+        ])
 
         let note = makeLabel(
             presentation.note ?? "",
@@ -123,41 +183,62 @@ final class LookupPanelController {
 
         let contextStatus = makeLabel(
             presentation.contextStatus ?? "",
-            font: .systemFont(ofSize: 11, weight: .medium),
-            color: presentation.contextStatus == nil ? .secondaryLabelColor : .systemBlue
+            font: .systemFont(ofSize: 11.5, weight: .semibold),
+            color: AppVisualTheme.accent
         )
         contextStatus.isHidden = presentation.contextStatus == nil
 
-        let speak = ActionButton(title: "▶ 发音") { [weak self] in
+        let statusPill = RoundedSurfaceView(
+            fillColor: AppVisualTheme.accentSoft,
+            strokeColor: .clear,
+            radius: 9
+        )
+        statusPill.isHidden = presentation.contextStatus == nil
+        statusPill.addSubview(contextStatus)
+        contextStatus.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            contextStatus.leadingAnchor.constraint(equalTo: statusPill.leadingAnchor, constant: 9),
+            contextStatus.trailingAnchor.constraint(equalTo: statusPill.trailingAnchor, constant: -9),
+            contextStatus.topAnchor.constraint(equalTo: statusPill.topAnchor, constant: 4),
+            contextStatus.bottomAnchor.constraint(equalTo: statusPill.bottomAnchor, constant: -4)
+        ])
+
+        let speak = ActionButton(title: "发音", symbolName: "speaker.wave.2.fill") { [weak self] in
             self?.onSpeak?(presentation.spokenText, presentation.spokenLocale)
         }
-        let copy = ActionButton(title: "复制") {
+        let copy = ActionButton(title: "复制", symbolName: "doc.on.doc") {
             NSPasteboard.general.clearContents()
             NSPasteboard.general.setString(presentation.spokenText, forType: .string)
         }
         weak var favoriteButtonReference: ActionButton?
         let favoriteButton = ActionButton(
-            title: presentation.isFavorite ? "★ 已收藏" : "☆ 收藏"
+            title: presentation.isFavorite ? "已收藏" : "收藏",
+            symbolName: presentation.isFavorite ? "star.fill" : "star"
         ) { [weak self] in
             guard let self,
                   let isFavorite = self.onToggleFavorite?(presentation.favoriteDraft) else { return }
-            favoriteButtonReference?.title = isFavorite ? "★ 已收藏" : "☆ 收藏"
+            favoriteButtonReference?.title = isFavorite ? "已收藏" : "收藏"
+            favoriteButtonReference?.image = AppVisualTheme.symbol(isFavorite ? "star.fill" : "star")
         }
         favoriteButtonReference = favoriteButton
 
         weak var directDisplayButtonReference: ActionButton?
         let directDisplayButton = ActionButton(
-            title: presentation.directDisplayEnabled ? "选中即展示：开" : "选中即展示：关"
+            title: presentation.directDisplayEnabled ? "自动展示：开" : "自动展示：关",
+            symbolName: presentation.directDisplayEnabled ? "eye.fill" : "eye.slash",
+            style: .quiet
         ) { [weak self] in
             guard let self, let enabled = self.onToggleDirectDisplay?() else { return }
-            directDisplayButtonReference?.title = enabled ? "选中即展示：开" : "选中即展示：关"
+            directDisplayButtonReference?.title = enabled ? "自动展示：开" : "自动展示：关"
+            directDisplayButtonReference?.image = AppVisualTheme.symbol(enabled ? "eye.fill" : "eye.slash")
         }
         directDisplayButtonReference = directDisplayButton
-        let pause = ActionButton(title: "暂停 1 小时") { [weak self] in
+        let pause = ActionButton(
+            title: "暂停 1 小时",
+            symbolName: "moon.zzz",
+            style: .quiet
+        ) { [weak self] in
             self?.onPauseForOneHour?()
-        }
-        let close = ActionButton(title: "关闭") { [weak self] in
-            self?.hide()
         }
 
         let primaryControls = NSStackView(views: [speak, copy, favoriteButton])
@@ -168,15 +249,21 @@ final class LookupPanelController {
         var translationControlViews: [NSView] = []
         if let translationDraft = presentation.localTranslationDraft,
            let translationActionTitle = presentation.localTranslationActionTitle {
-            let translate = ActionButton(title: translationActionTitle) { [weak self] in
+            let translate = ActionButton(
+                title: translationActionTitle,
+                symbolName: "arrow.left.arrow.right",
+                style: .primary
+            ) { [weak self] in
                 self?.onRequestLocalTranslation?(translationDraft)
             }
-            translate.bezelColor = .controlAccentColor
             translationControlViews.append(translate)
         }
         if let translationDraft = presentation.aiTranslationDraft,
            let translationActionTitle = presentation.aiTranslationActionTitle {
-            let translate = ActionButton(title: translationActionTitle) { [weak self] in
+            let translate = ActionButton(
+                title: translationActionTitle,
+                symbolName: "sparkles"
+            ) { [weak self] in
                 self?.onRequestAITranslation?(translationDraft)
             }
             translate.toolTip = "使用已配置的 AI 服务，可能产生 API 费用"
@@ -187,16 +274,15 @@ final class LookupPanelController {
         translationControls.alignment = .centerY
         translationControls.spacing = 8
 
-        let secondaryControls = NSStackView(views: [directDisplayButton, pause, close])
+        let secondaryControls = NSStackView(views: [directDisplayButton, pause])
         secondaryControls.orientation = .horizontal
         secondaryControls.alignment = .centerY
         secondaryControls.spacing = 8
 
         var contentViews: [NSView] = [
-            title,
-            pronunciation,
-            contextStatus,
-            meaning,
+            header,
+            statusPill,
+            meaningCard,
             note,
             primaryControls
         ]
@@ -207,15 +293,18 @@ final class LookupPanelController {
         let content = NSStackView(views: contentViews)
         content.orientation = .vertical
         content.alignment = .leading
-        content.spacing = 8
-        content.edgeInsets = NSEdgeInsets(top: 16, left: 16, bottom: 14, right: 16)
+        content.spacing = 11
+        content.edgeInsets = NSEdgeInsets(top: 16, left: 16, bottom: 13, right: 16)
         content.translatesAutoresizingMaskIntoConstraints = false
 
         let effect = NSVisualEffectView()
         effect.material = .popover
         effect.state = .active
         effect.wantsLayer = true
-        effect.layer?.cornerRadius = 12
+        effect.layer?.cornerRadius = 18
+        effect.layer?.cornerCurve = .continuous
+        effect.layer?.borderColor = AppVisualTheme.border.cgColor
+        effect.layer?.borderWidth = 1
         effect.translatesAutoresizingMaskIntoConstraints = false
         effect.addSubview(content)
 
@@ -224,16 +313,17 @@ final class LookupPanelController {
             content.trailingAnchor.constraint(equalTo: effect.trailingAnchor),
             content.topAnchor.constraint(equalTo: effect.topAnchor),
             content.bottomAnchor.constraint(equalTo: effect.bottomAnchor),
-            title.widthAnchor.constraint(lessThanOrEqualToConstant: 388),
-            meaning.widthAnchor.constraint(lessThanOrEqualToConstant: 388),
-            note.widthAnchor.constraint(lessThanOrEqualToConstant: 388),
-            contextStatus.widthAnchor.constraint(lessThanOrEqualToConstant: 388)
+            content.widthAnchor.constraint(equalToConstant: 448),
+            header.widthAnchor.constraint(equalTo: content.widthAnchor, constant: -32),
+            titleColumn.widthAnchor.constraint(lessThanOrEqualToConstant: 320),
+            meaningCard.widthAnchor.constraint(equalTo: content.widthAnchor, constant: -32),
+            note.widthAnchor.constraint(lessThanOrEqualToConstant: 416)
         ])
 
         let fittingSize = content.fittingSize
         let size = NSSize(
-            width: max(320, min(420, fittingSize.width)),
-            height: max(170, min(500, fittingSize.height))
+            width: 448,
+            height: max(196, min(540, fittingSize.height))
         )
         installDisplayedContent(effect, size: size)
         positionPanel(size: size, near: bounds)
@@ -346,6 +436,13 @@ final class LookupPanelController {
         label.isSelectable = true
         label.drawsBackground = false
         return label
+    }
+
+    private func flexibleSpacer() -> NSView {
+        let spacer = NSView()
+        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return spacer
     }
 
     private func installDisplayedContent(_ view: NSView, size: NSSize) {

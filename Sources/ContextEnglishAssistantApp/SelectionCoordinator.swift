@@ -10,6 +10,7 @@ final class SelectionCoordinator {
     private let selectionReader: AccessibilitySelectionReader
     private let triggerPolicy: TriggerPolicy
     private let lookupRoutingPolicy = LookupRoutingPolicy()
+    private let automaticTranslationPolicy = AutomaticTranslationPolicy()
     private let pauseManager: PauseManager
     private let dictionary: DictionaryProviding
     private let panelController: LookupPanelController
@@ -281,6 +282,17 @@ final class SelectionCoordinator {
         )
 
         panelController.showFull(presentation, near: snapshot.bounds)
+
+        if automaticTranslationPolicy.shouldTranslate(
+            text: text,
+            language: snapshot.language,
+            route: route,
+            hasLocalEntry: localEntry != nil,
+            serviceAvailable: localTranslationService != nil
+        ) {
+            onDiagnosticChanged?("已识别为短语或句子，正在自动使用本机翻译…")
+            requestLocalTranslation(translationDraft)
+        }
     }
 
     private func requestLocalTranslation(_ draft: TranslationDraft) {
