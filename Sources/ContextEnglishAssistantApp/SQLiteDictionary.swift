@@ -17,6 +17,7 @@ final class SQLiteDictionary: DictionaryProviding {
     }
 
     private var database: OpaquePointer?
+    private var supportsSynonyms = false
     private let cache = NSCache<NSString, CacheValue>()
 
     static func bundled() throws -> SQLiteDictionary {
@@ -38,6 +39,7 @@ final class SQLiteDictionary: DictionaryProviding {
             database = nil
             throw DictionaryError.databaseOpenFailed(message)
         }
+        supportsSynonyms = tableExists("synonyms")
         cache.countLimit = 1_000
     }
 
@@ -202,8 +204,79 @@ final class SQLiteDictionary: DictionaryProviding {
             phonetic: phonetic,
             partOfSpeech: partOfSpeech,
             meanings: meanings,
+            synonyms: synonyms(for: word),
             usageNote: sourceNote
         )
+    }
+
+    private func synonyms(for word: String) -> [String] {
+        guard supportsSynonyms, let database else { return [] }
+        let direct = synonymRows(
+            database: database,
+            sql: """
+            SELECT synonym FROM synonyms
+            WHERE word = ? COLLATE NOCASE
+            ORDER BY rank, length(synonym), synonym
+            LIMIT 8
+            """,
+            parameter: word
+        )
+        if !direct.isEmpty { return direct }
+
+        return synonymRows(
+            database: database,
+            sql: """
+            SELECT s.synonym
+            FROM forms f JOIN synonyms s ON s.word = f.lemma COLLATE NOCASE
+            WHERE f.form = ? COLLATE NOCASE
+            ORDER BY s.rank, length(s.synonym), s.synonym
+            LIMIT 8
+            """,
+            parameter: word
+        )
+    }
+
+    private func synonymRows(
+        database: OpaquePointer,
+        sql: String,
+        parameter: String
+    ) -> [String] {
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK,
+              let statement else {
+            return []
+        }
+        defer { sqlite3_finalize(statement) }
+        guard parameter.withCString({ pointer in
+            sqlite3_bind_text(statement, 1, pointer, -1, SQLITE_TRANSIENT)
+        }) == SQLITE_OK else {
+            return []
+        }
+
+        var values: [String] = []
+        while sqlite3_step(statement) == SQLITE_ROW {
+            if let value = columnText(statement, index: 0) {
+                values.append(value)
+            }
+        }
+        return values
+    }
+
+    private func tableExists(_ tableName: String) -> Bool {
+        guard let database else { return false }
+        var statement: OpaquePointer?
+        let sql = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ? LIMIT 1"
+        guard sqlite3_prepare_v2(database, sql, -1, &statement, nil) == SQLITE_OK,
+              let statement else {
+            return false
+        }
+        defer { sqlite3_finalize(statement) }
+        guard tableName.withCString({ pointer in
+            sqlite3_bind_text(statement, 1, pointer, -1, SQLITE_TRANSIENT)
+        }) == SQLITE_OK else {
+            return false
+        }
+        return sqlite3_step(statement) == SQLITE_ROW
     }
 
     private func columnText(_ statement: OpaquePointer, index: Int32) -> String? {

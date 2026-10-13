@@ -8,3 +8,14 @@ Repository license: MIT (see ECDICT-LICENSE.txt)
 
 The separately distributed lemma.en.txt file is not included in this app.
 Inflection mappings are derived only from the exchange field in ecdict.csv.
+
+Princeton WordNet 3.1 synonym data
+
+Source: https://wordnet.princeton.edu/
+Database archive: https://wordnetcode.princeton.edu/wn3.1.dict.tar.gz
+Archive SHA-256: 55e9b82aa14655ff34fb208638561db459e0db716bd0d8b8edb8a957154c71a0
+License: WordNet 3.1 license (see WORDNET-LICENSE.txt)
+
+Only co-synset relationships and adjective "also see" / "similar to" relationships
+between words present in the bundled ECDICT database are included. WordNet glosses
+and its original database files are not redistributed.
