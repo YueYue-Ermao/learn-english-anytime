@@ -61,7 +61,7 @@ Safari / Chrome / Office / Electron / 其他应用
 
 | 输入/意图 | 默认引擎 | 是否联网 |
 |---|---|---|
-| 英文单词、词形 | ECDICT SQLite + 词形索引 | 否 |
+| 英文单词、词形、相关近义词 | ECDICT + WordNet SQLite + 词形索引 | 否 |
 | 常见中文词语 | 本地汉英反向索引 | 否 |
 | 一般中英文句子 | Apple Translation（macOS 15+） | 首次下载语言包 |
 | 场景化地道表达 | 用户配置的 AI 服务 | 是，主动触发 |
@@ -90,8 +90,9 @@ Safari / Chrome / Office / Electron / 其他应用
 - `exchange` 构建的词形映射；
 - 从中文释义生成的汉英反向索引；
 - 常见职场词汇校准。
+- Princeton WordNet 3.1 派生的同义词集合，以及形容词 `also see` / `similar to` 关系。
 
-数据库约 108 MiB，超过 GitHub 100 MiB 单文件限制，因此不提交到源码仓库。Release 安装包内包含完整数据库；开发者也可按 [词典构建说明](DICTIONARY.md) 重建。
+近义词在构建阶段结合 WordNet sense tag count 与 ECDICT 常见度排序，每个词最多保存 12 个候选，界面最多展示 8 个；运行时不联网，也不请求模型。包含近义词的数据库约 131 MiB，超过 GitHub 100 MiB 单文件限制，因此不提交到源码仓库。Release 安装包内包含完整数据库；开发者也可按 [词典构建说明](DICTIONARY.md) 重建。
 
 ### 6.2 用户收藏
 

@@ -58,7 +58,17 @@ struct ContextEnglishAssistantMain {
                     exit(1)
                 }
             }
-            print("Bidirectional dictionary self-test passed (\(expectations.count) cases)")
+            guard let happy = dictionary.lookup("happy"),
+                  happy.synonyms.contains("glad"),
+                  let important = dictionary.lookup("important"),
+                  important.synonyms.contains("significant") else {
+                fputs("Dictionary synonym self-test failed\n", stderr)
+                exit(1)
+            }
+            print(
+                "Bidirectional dictionary and synonym self-test passed "
+                    + "(\(expectations.count) lookup cases)"
+            )
         } catch {
             fputs("Dictionary self-test failed: \(error)\n", stderr)
             exit(1)

@@ -188,6 +188,7 @@ final class SelectionCoordinator {
         let title: String
         let pronunciation: String?
         let meaning: String
+        let synonyms: [String]
         let note: String?
         let spokenText: String
         let spokenLocale: String
@@ -197,12 +198,14 @@ final class SelectionCoordinator {
             title = entry.headword
             pronunciation = entry.phonetic
             meaning = partOfSpeech + entry.meanings.joined(separator: "；")
+            synonyms = entry.synonyms
             note = entry.usageNote
             spokenText = entry.spokenText ?? entry.headword
             spokenLocale = "en-US"
         } else if snapshot.language == .chinese || snapshot.language == .mixed {
             title = text
             pronunciation = nil
+            synonyms = []
             meaning = route == .localDictionaryFirst
                 ? "本地汉英词典暂未收录；可使用“本机翻译（免费）”生成英文。"
                 : "已识别为短语或句子；可直接使用 Apple 本机翻译。"
@@ -212,6 +215,7 @@ final class SelectionCoordinator {
         } else {
             title = text
             pronunciation = nil
+            synonyms = []
             meaning = route == .localDictionaryFirst
                 ? "离线词典暂未收录，可使用本机翻译。"
                 : "已识别为短语或句子，可直接使用 Apple 本机翻译。"
@@ -252,6 +256,7 @@ final class SelectionCoordinator {
             title: title,
             pronunciation: pronunciation,
             meaning: meaning,
+            synonyms: synonyms,
             note: note,
             spokenText: spokenText,
             spokenLocale: spokenLocale,
@@ -409,6 +414,7 @@ final class SelectionCoordinator {
             title: originalDraft.selectedText,
             pronunciation: nil,
             meaning: meaning,
+            synonyms: [],
             note: note,
             spokenText: result.targetText,
             spokenLocale: speechLocale(for: result.targetLanguage),
@@ -462,6 +468,7 @@ final class SelectionCoordinator {
             title: response.selectedMeaning.source,
             pronunciation: response.selectedMeaning.partOfSpeech,
             meaning: meaning,
+            synonyms: [],
             note: favoriteDraft.note,
             spokenText: resultText,
             spokenLocale: speechLocale(for: response.targetLanguage),

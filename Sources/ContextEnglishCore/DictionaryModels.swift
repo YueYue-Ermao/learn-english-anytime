@@ -5,6 +5,7 @@ public struct DictionaryEntry: Equatable, Sendable {
     public let phonetic: String?
     public let partOfSpeech: String?
     public let meanings: [String]
+    public let synonyms: [String]
     public let usageNote: String?
     public let spokenText: String?
 
@@ -13,6 +14,7 @@ public struct DictionaryEntry: Equatable, Sendable {
         phonetic: String?,
         partOfSpeech: String?,
         meanings: [String],
+        synonyms: [String] = [],
         usageNote: String?,
         spokenText: String? = nil
     ) {
@@ -20,6 +22,7 @@ public struct DictionaryEntry: Equatable, Sendable {
         self.phonetic = phonetic
         self.partOfSpeech = partOfSpeech
         self.meanings = meanings
+        self.synonyms = synonyms
         self.usageNote = usageNote
         self.spokenText = spokenText
     }
@@ -39,6 +42,7 @@ public struct PrototypeDictionary: DictionaryProviding, Sendable {
                 phonetic: "/praɪˈɔːrətaɪz/",
                 partOfSpeech: "verb",
                 meanings: ["确定优先顺序", "优先处理"],
+                synonyms: ["rank", "order"],
                 usageNote: "产品和项目管理中常用于说明如何安排需求或任务。"
             ),
             "align": DictionaryEntry(
@@ -46,6 +50,7 @@ public struct PrototypeDictionary: DictionaryProviding, Sendable {
                 phonetic: "/əˈlaɪn/",
                 partOfSpeech: "verb",
                 meanings: ["使一致", "就目标或优先级达成一致"],
+                synonyms: ["coordinate", "adjust"],
                 usageNote: "职场中常见搭配：align on priorities。"
             ),
             "trade-off": DictionaryEntry(
@@ -53,6 +58,7 @@ public struct PrototypeDictionary: DictionaryProviding, Sendable {
                 phonetic: "/ˈtreɪd ɒf/",
                 partOfSpeech: "noun",
                 meanings: ["权衡", "取舍"],
+                synonyms: ["compromise", "exchange"],
                 usageNote: "产品决策中用于描述两个目标无法同时最大化时的选择。"
             )
         ]

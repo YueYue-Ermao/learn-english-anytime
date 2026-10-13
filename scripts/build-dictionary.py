@@ -10,6 +10,7 @@ import sqlite3
 from pathlib import Path
 
 from chinese_reverse_index import INSERT_SQL, SCHEMA, curated_rows, reverse_rows
+from wordnet_synonyms import install_synonyms
 
 
 def normalized_word(value: str) -> str:
@@ -174,6 +175,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
     parser.add_argument("destination", type=Path)
+    parser.add_argument(
+        "--wordnet-dict",
+        type=Path,
+        help="Optional directory containing WordNet data.* and index.* files",
+    )
     arguments = parser.parse_args()
     entries, forms, reverse_mappings = build_database(arguments.source, arguments.destination)
     size = arguments.destination.stat().st_size
@@ -181,6 +187,9 @@ def main() -> None:
         f"Built {arguments.destination}: {entries} entries, {forms} forms, "
         f"{reverse_mappings} Chinese reverse mappings, {size} bytes"
     )
+    if arguments.wordnet_dict:
+        words, synonyms = install_synonyms(arguments.destination, arguments.wordnet_dict)
+        print(f"Added {synonyms} synonym links for {words} words")
 
 
 if __name__ == "__main__":

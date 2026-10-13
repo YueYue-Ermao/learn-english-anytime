@@ -5,6 +5,7 @@ struct LookupPresentation {
     let title: String
     let pronunciation: String?
     let meaning: String
+    let synonyms: [String]
     let note: String?
     let spokenText: String
     let spokenLocale: String
@@ -173,6 +174,38 @@ final class LookupPanelController {
             meaning.bottomAnchor.constraint(equalTo: meaningCard.bottomAnchor, constant: -11)
         ])
 
+        let synonymHeading = makeLabel(
+            "相关近义词 · 请按语境选用",
+            font: .systemFont(ofSize: 11.5, weight: .semibold),
+            color: .secondaryLabelColor
+        )
+        let synonymList = makeLabel(
+            presentation.synonyms.joined(separator: "  ·  "),
+            font: .systemFont(ofSize: 13.5, weight: .medium),
+            color: AppVisualTheme.accent
+        )
+        synonymList.maximumNumberOfLines = 3
+        synonymList.lineBreakMode = .byWordWrapping
+        let synonymColumn = NSStackView(views: [synonymHeading, synonymList])
+        synonymColumn.orientation = .vertical
+        synonymColumn.alignment = .leading
+        synonymColumn.spacing = 5
+        synonymColumn.isHidden = presentation.synonyms.isEmpty
+        let synonymCard = RoundedSurfaceView(
+            fillColor: AppVisualTheme.accentSoft.withAlphaComponent(0.72),
+            strokeColor: AppVisualTheme.accent.withAlphaComponent(0.12),
+            radius: 11
+        )
+        synonymCard.isHidden = presentation.synonyms.isEmpty
+        synonymCard.addSubview(synonymColumn)
+        synonymColumn.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            synonymColumn.leadingAnchor.constraint(equalTo: synonymCard.leadingAnchor, constant: 13),
+            synonymColumn.trailingAnchor.constraint(equalTo: synonymCard.trailingAnchor, constant: -13),
+            synonymColumn.topAnchor.constraint(equalTo: synonymCard.topAnchor, constant: 9),
+            synonymColumn.bottomAnchor.constraint(equalTo: synonymCard.bottomAnchor, constant: -9)
+        ])
+
         let note = makeLabel(
             presentation.note ?? "",
             font: .systemFont(ofSize: 12),
@@ -283,6 +316,7 @@ final class LookupPanelController {
             header,
             statusPill,
             meaningCard,
+            synonymCard,
             note,
             primaryControls
         ]
@@ -317,6 +351,7 @@ final class LookupPanelController {
             header.widthAnchor.constraint(equalTo: content.widthAnchor, constant: -32),
             titleColumn.widthAnchor.constraint(lessThanOrEqualToConstant: 320),
             meaningCard.widthAnchor.constraint(equalTo: content.widthAnchor, constant: -32),
+            synonymCard.widthAnchor.constraint(equalTo: content.widthAnchor, constant: -32),
             note.widthAnchor.constraint(lessThanOrEqualToConstant: 416)
         ])
 
