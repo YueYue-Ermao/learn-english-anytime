@@ -23,7 +23,7 @@
 
 Built for professionals and students who want to keep improving their English while they work and study. Select any unfamiliar English word or sentence to see its meaning and hear its pronunciation—without copying it or leaving the page or app you are using. When you know what you want to say in Chinese but need a natural English expression, get immediate, context-aware suggestions in the same place.
 
-这是一款 macOS / Apple Silicon 应用。v0.7.1 在精美划词浮窗中增加了离线相关近义词；未命中词典的短语和短句继续自动使用 Apple 设备端翻译，单词本、好句收藏夹和语法问答保持可用。
+这是一款 macOS / Apple Silicon 应用。v0.7.2 默认推荐无需 API 的本地优先模式：离线查词、相关近义词、发音、收藏与 Apple 设备端翻译开箱可用；需要场景化改写或语法问答时，再按需连接自己的 AI 服务。
 
 > 当前为公开测试版：支持 macOS 14+ 和 Apple Silicon（M1/M2/M3/M4）。安装包使用临时签名，尚未完成 Apple Developer ID 公证。
 
@@ -33,7 +33,14 @@ Built for professionals and students who want to keep improving their English wh
 |---|---|---|
 | 在网页、Office 和常见应用中选中英文，直接查看释义与发音 | 输入中文意思和使用场景，获得更符合真实语境的英文表达 | 把单词、词组和好句收藏到本地学习中心，随时搜索和复习 |
 
-基础查词、收藏和支持系统版本上的 Apple 本机翻译无需项目 AI 服务。地道化表达和语法问答是用户主动触发的可选能力。
+## 无需 API 即可开始
+
+| 使用方式 | 好处 | 限制 |
+|---|---|---|
+| **不配置 AI（推荐）** | 无模型费用；离线查词、近义词、发音、收藏可直接使用；支持系统版本上的句子翻译在设备端完成；选中文字不会发送给模型服务 | 不提供场景化改写、开放式语法问答和 AI 地道表达建议 |
+| **配置自己的 AI 服务（可选）** | 增加结合场景的中英表达、AI 地道化和结构化语法解释 | 需要自己的 API 账号或服务端；可能产生费用；主动使用 AI 功能时会发送必要文字 |
+
+第一次使用建议完全不配置 AI。只有当本机翻译不足以处理面试、简历、商务表达等场景时，再打开“AI 服务（可选）”进行设置。
 
 ## 快速开始
 
@@ -45,7 +52,7 @@ Built for professionals and students who want to keep improving their English wh
 - [隐私说明](docs/PRIVACY.md)
 - [正式签名与公证准备](docs/DISTRIBUTION.md)
 - [Apple / Android 跨平台路线图](docs/CROSS_PLATFORM_ROADMAP.md)
-- [v0.7.1 发布说明](docs/releases/v0.7.1.md)
+- [v0.7.2 发布说明](docs/releases/v0.7.2.md)
 
 从源码构建时请注意：包含近义词数据的完整离线词典约 131 MiB，超过 GitHub 单文件限制，因此不提交到源码仓库；Release 安装包已经内置，开发者也可以按照词典文档重建。
 
@@ -97,7 +104,7 @@ Built for professionals and students who want to keep improving their English wh
 - Safari、Chrome 和 Office 对 Accessibility 的暴露方式不同，必须真机逐项验证。
 - 多显示器上下排列的坐标转换还需要真实设备校准。
 
-## v0.7.1 使用入口
+## v0.7.2 使用入口
 
 - 应用主窗口 → `我的单词本`、`好句收藏夹`、`语法问答`。
 - 主窗口 → `好句收藏夹` → `+ 新建`：建立产品经理面试、工作汇报、日常口语等主题收藏夹。
@@ -144,14 +151,14 @@ sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
 ```text
 dist/Context English Assistant.app
-dist/Context-English-Assistant-v0.7.1-arm64.zip
+dist/Context-English-Assistant-v0.7.2-arm64.zip
 ```
 
 ## 首次安装与授权
 
 1. 退出并删除旧的应用副本，避免同时存在 `Context English Assistant.app` 和 Finder 自动命名的 `Context English Assistant 2.app`。
 2. 解压 ZIP，只把其中唯一的应用移动到“应用程序”文件夹。
-3. 从“应用程序”文件夹双击启动。v0.7.1 会直接显示“英语学习中心”主窗口。
+3. 从“应用程序”文件夹双击启动。v0.7.2 会直接显示“英语学习中心”主窗口。
 4. 点击“打开辅助功能设置”，在以下位置开启当前这个应用：
 
 ```text
@@ -177,6 +184,7 @@ dist/Context-English-Assistant-v0.7.1-arm64.zip
 - v0.6.0 增加普通 Mac 主窗口、单词本、多好句收藏夹和结构化语法问答；菜单栏划词继续保留。
 - v0.7.0 统一浮窗与学习中心视觉，并让短语和短句自动走 Apple 本机翻译。
 - v0.7.1 为英文查词增加离线相关近义词，并兼容不含近义词表的旧数据库。
+- v0.7.2 将无 API 本地模式明确为推荐默认，并在应用与文档中说明它的好处和限制。
 - 确认只保留一个应用副本，并以诊断窗口展示的实际路径为准授权。
 - 如果看不到窗口，可先从“活动监视器”退出所有 `Context English Assistant` 进程，再从“应用程序”文件夹重开。
 - 本开发包使用临时签名，macOS 首次拦截时请右键应用选择“打开”；正式发布需使用 Apple Developer ID 签名并完成公证。

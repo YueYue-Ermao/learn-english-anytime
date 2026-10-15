@@ -14,7 +14,7 @@ final class ServiceSettingsWindowController: NSWindowController, NSWindowDelegat
             backing: .buffered,
             defer: false
         )
-        window.title = "AI 服务设置"
+        window.title = "AI 服务（可选）"
         window.isReleasedWhenClosed = false
         window.center()
         super.init(window: window)
@@ -30,7 +30,7 @@ final class ServiceSettingsWindowController: NSWindowController, NSWindowDelegat
     func present() {
         endpointField.stringValue = settings.contextualTranslationEndpoint?.absoluteString ?? ""
         statusLabel.stringValue = settings.contextualTranslationEndpoint == nil
-            ? "尚未配置 AI 服务；本机翻译、单词本和好句收藏仍可使用。开发服务地址为 http://127.0.0.1:8765/v1/translations/contextual"
+            ? "当前使用推荐的无 API 模式：无模型费用，选中文字不会发送给模型服务。"
             : "只有主动点击“AI 地道化”“生成表达”或“语法提问”时，才会发送对应内容。"
         _ = NSApplication.shared.setActivationPolicy(.regular)
         showWindow(nil)
@@ -45,11 +45,11 @@ final class ServiceSettingsWindowController: NSWindowController, NSWindowDelegat
 
     private func configureContent() {
         guard let contentView = window?.contentView else { return }
-        let title = NSTextField(labelWithString: "可选 AI 语言服务地址")
+        let title = NSTextField(labelWithString: "先直接使用，需要时再配置 AI")
         title.font = .systemFont(ofSize: 18, weight: .semibold)
 
         let detail = NSTextField(wrappingLabelWithString:
-            "普通查词和句子翻译均可在本机免费完成。此服务用于场景化改写和语法问答；语法接口会自动使用同一主机的 /v1/grammar/questions。留空不会影响本机翻译和收藏。"
+            "推荐保持留空：离线查词、近义词、发音、收藏和支持系统版本上的 Apple 本机翻译均可使用，无模型费用。限制是不能使用场景化改写、开放式语法问答和更地道的表达建议；需要这些能力时，再填写你自己的服务地址。"
         )
         detail.textColor = .secondaryLabelColor
 
@@ -95,7 +95,8 @@ final class ServiceSettingsWindowController: NSWindowController, NSWindowDelegat
         let value = endpointField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
         if value.isEmpty {
             settings.contextualTranslationEndpoint = nil
-            statusLabel.stringValue = "已清除服务地址。离线查词和收藏不受影响。"
+            statusLabel.textColor = .systemGreen
+            statusLabel.stringValue = "已切换到无 API 模式。离线查词、本机翻译、发音和收藏仍可使用。"
             return
         }
         guard let url = URL(string: value),
